@@ -2,8 +2,14 @@ window.onload = function() {
 	buildTab();
 	initPlayersPieces();
 	addEventListeners();
+	initScore();
 }
 
+
+function initScore() {
+	document.getElementById("pontuacaoVermelho").innerHTML = 0;
+	document.getElementById("pontuacaoAmarelo").innerHTML = 0;
+}
 
 function buildTab() {
 	var table = document.createElement("table");
@@ -82,6 +88,149 @@ function addEventListeners() {
 	}
 }
 
+var click = 0;
+var cellAnterior;
+
 function cellClicked(cell) {
-	alert("x = " + cell.cellIndex + ", y = " + cell.parentNode.rowIndex );
+	
+	if(cell.getAttribute("bgColor") === "red" || cell.getAttribute("bgColor") === "yellow" || cell.getAttribute()) {
+			if(click == 0) {
+				calcPossibilities(cell);	
+				cellAnterior = cell;
+				click =1;
+			} else {
+				
+				if(isNeighbor(cellAnterior, cell)){
+					if(isEnemy(cellAnterior, cell)) {
+						updateScore(cellAnterior);
+						move(cellAnterior, cell);
+					} else {
+						if(!hasPiece(cell)) {
+							move(cellAnterior, cell);	
+						}
+					} 
+				}
+				
+				click =0;
+				cleanPossibilities();
+			}	
+	}
+	
+}
+
+function updateScore(cell) {
+	if(cell.getAttribute("bgColor") === "red") {
+		var points = document.getElementById("pontuacaoVermelho").innerHTML;
+		points++;
+		document.getElementById("pontuacaoVermelho").innerHTML = points;
+	} 
+	if(cell.getAttribute("bgColor") === "yellow"){
+		var points = document.getElementById("pontuacaoAmarelo").innerHTML;
+		points++;
+		document.getElementById("pontuacaoAmarelo").innerHTML = points;
+	}
+}
+
+function move(cellAnterior, cell) {
+	cell.setAttribute("bgColor", cellAnterior.getAttribute("bgColor"));
+	cellAnterior.removeAttribute("bgColor");
+}
+
+function isEnemy(cellAnterior, cell) { 
+	
+	var enemy = false;
+	
+	if(cell.getAttribute("bgColor") != null && cell.getAttribute("bgColor") != "") {
+		if(cell.getAttribute("bgColor") != "green") {
+			if(cell.getAttribute("bgColor") != cellAnterior.getAttribute("bgColor")) {
+				enemy = true;	
+			}
+		}
+	}
+
+	return enemy;
+}
+
+function cleanPossibilities() {
+	var table = document.getElementsByTagName("table")[0];
+	
+	for(var i = 0; i < table.rows.length; i++) {
+		var tr = table.rows[i];
+		
+		for(var j = 0; j < tr.cells.length; j++) {
+			
+			var td = tr.cells[j];
+			if(td.getAttribute("bgColor") === "green") {
+				td.removeAttribute("bgColor");
+			}
+		}
+	}
+}
+
+function isNeighbor(cellAnterior, cell) {
+	
+	var neighbor = false;
+	
+	var xAnterior = cellAnterior.cellIndex;
+	var yAnterior = cellAnterior.parentNode.rowIndex;
+	
+	var x = cell.cellIndex;
+	var y = cell.parentNode.rowIndex;
+	
+	if(!(Math.abs(xAnterior - x) <= 1 && Math.abs(yAnterior - y) <= 1)) {
+		alert("You can't move to this place");
+	} else {
+		neighbor = true;
+	}
+	
+	return neighbor;	
+}
+
+function calcPossibilities(cell) {
+	var x = cell.cellIndex;
+	var y = cell.parentNode.rowIndex;
+	
+	var table = document.getElementsByTagName("table")[0];
+	
+	if(cell.getAttribute("bgColor") === "red" || cell.getAttribute("bgColor") === "yellow") {
+			//norte
+			if(y - 1 >= 0) {
+				var tr = table.rows[y - 1];
+				var td = tr.cells[x];
+				if(!hasPiece(td)) {
+					td.setAttribute("bgColor", "green");	
+				}
+			} 
+			
+			//sul
+			if(y + 1 < 10) {
+				var tr = table.rows[y + 1];
+				var td = tr.cells[x];
+				if(!hasPiece(td)) {
+					td.setAttribute("bgColor", "green");
+				}
+			}
+			
+			//leste
+			if(x - 1 >= 0) {
+				var tr = table.rows[y];
+				var td = tr.cells[x - 1];
+				if(!hasPiece(td)) {
+					td.setAttribute("bgColor", "green");
+				}	
+			}
+			
+			//oeste
+			if(x + 1 < 10) {
+				var tr = table.rows[y];
+				var td = tr.cells[x + 1];
+				if(!hasPiece(td)) {
+					td.setAttribute("bgColor", "green");
+				}
+			}
+	}
+}
+
+function hasPiece(td) {
+	return (td.getAttribute("bgColor") === "red" || td.getAttribute("bgColor") === "yellow");
 }
