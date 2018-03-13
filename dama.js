@@ -93,7 +93,7 @@ var cellAnterior;
 
 function cellClicked(cell) {
 	
-	if(cell.getAttribute("bgColor") === "red" || cell.getAttribute("bgColor") === "yellow" || cell.getAttribute()) {
+	if(cell.getAttribute("bgColor") === "red" || cell.getAttribute("bgColor") === "yellow" || cell.getAttribute("bgColor") === "green") {
 			if(click == 0) {
 				calcPossibilities(cell);	
 				cellAnterior = cell;
@@ -181,9 +181,23 @@ function isNeighbor(cellAnterior, cell) {
 		alert("You can't move to this place");
 	} else {
 		neighbor = true;
-	}
+	} 
 	
 	return neighbor;	
+}
+
+function paintPossibility(pos1, pos2) {
+	var table = document.getElementsByTagName("table")[0];
+
+	var tr = table.rows[pos1];
+	var td = tr.cells[pos2];
+	if(!hasPiece(td)) {
+		td.setAttribute("bgColor", "green");	
+	} else {
+		if(isEnemy()) {
+
+		}
+	}
 }
 
 function calcPossibilities(cell) {
@@ -195,42 +209,50 @@ function calcPossibilities(cell) {
 	if(cell.getAttribute("bgColor") === "red" || cell.getAttribute("bgColor") === "yellow") {
 			//norte
 			if(y - 1 >= 0) {
-				var tr = table.rows[y - 1];
-				var td = tr.cells[x];
-				if(!hasPiece(td)) {
-					td.setAttribute("bgColor", "green");	
-				}
+				paintPossibility(y-1, x, cell);
 			} 
 			
+			//nordeste
+			if((y - 1 < 10) && (x - 1 >=0) ) {
+				paintPossibility(y-1, x-1, cell);
+			} 
+
+			//noroeste
+			if( (y - 1 >=0) && (x + 1 < 10) ) {
+				paintPossibility(y-1, x+1, cell);
+			}
+
 			//sul
 			if(y + 1 < 10) {
-				var tr = table.rows[y + 1];
-				var td = tr.cells[x];
-				if(!hasPiece(td)) {
-					td.setAttribute("bgColor", "green");
-				}
+				paintPossibility(y+1, x, cell);
+			}
+
+			//sudeste
+			if((y + 1 < 10) && (x - 1 >= 0)) {
+				paintPossibility(y+1, x-1);
 			}
 			
+			//sudoeste
+			if((y + 1 < 10) && (x + 1 < 10)) {
+				paintPossibility(y+1, x+1);
+			}
+
 			//leste
 			if(x - 1 >= 0) {
-				var tr = table.rows[y];
-				var td = tr.cells[x - 1];
-				if(!hasPiece(td)) {
-					td.setAttribute("bgColor", "green");
-				}	
+				paintPossibility(y, x-1);	
 			}
 			
 			//oeste
 			if(x + 1 < 10) {
-				var tr = table.rows[y];
-				var td = tr.cells[x + 1];
-				if(!hasPiece(td)) {
-					td.setAttribute("bgColor", "green");
-				}
+				paintPossibility(y, x+1);
 			}
 	}
 }
 
 function hasPiece(td) {
 	return (td.getAttribute("bgColor") === "red" || td.getAttribute("bgColor") === "yellow");
+}
+
+function moveThroughEnemy() {
+
 }
